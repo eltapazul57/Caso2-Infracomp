@@ -1,4 +1,6 @@
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 
@@ -24,6 +26,12 @@ public class App {
             switch (option) {
                 case 1:
                     opcionGenerarReferencias(scanner);
+                    break;
+                case 3:
+                    opcionEsconderMensaje(scanner);
+                    break;
+                case 4:
+                    opcionRecuperarMensaje(scanner);
                     break;
             }
         }
@@ -80,6 +88,29 @@ public class App {
     }
 
     public void opcionRecuperarMensaje(Scanner scanner) {
-        //TODO
+        //PROBAR CON MÁS CASOS
+        InputStreamReader isr = new InputStreamReader(System.in);
+        BufferedReader br = new BufferedReader(isr);
+        try {
+            System.out.println("Nombre del archivo con el mensaje escondido: ");
+            String ruta = br.readLine();
+            System.out.println("Nombre del archivo para almacenar el mensaje recuperado: ");
+            String salida = br.readLine();
+            // Leer la imagen y el mensaje escondido
+            Imagen imagen = new Imagen(ruta);
+            int longitud = imagen.leerLongitud();
+            char[] mensaje = new char[longitud];
+            // Recuperar el mensaje de la imagen
+            imagen.recuperar(mensaje, longitud);
+            // Convertir el mensaje char[] a un String
+            String mensajeCompleto = new String(mensaje);
+            // Escribir el mensaje en el archivo de salida
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(salida))) {
+                writer.write(mensajeCompleto);
+            }
+            System.out.println("Mensaje recuperado y guardado en: " + salida);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
