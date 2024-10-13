@@ -1,14 +1,10 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 import java.nio.file.Files;
 import java.nio.file.Paths; 
-import java.io.IOException;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 
 public class App {    
     public static void main(String[] args) {
