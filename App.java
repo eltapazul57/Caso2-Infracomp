@@ -52,6 +52,24 @@ public class App {
         int pageSize= scanner.nextInt();
         System.out.print("Ingrese el nombre del archivo que guarda la imagen: ");
         String fileName = scanner.next();
+        Imagen imagen = new Imagen(fileName);
+
+        int np = (imagen.alto * imagen.ancho * 3) / pageSize + (imagen.leerLongitud()/pageSize);
+        int nr = (imagen.leerLongitud()*17 + 16);
+
+        String mensajeCompleto = "";
+        mensajeCompleto = mensajeCompleto + "P = " + pageSize + "\n";
+        mensajeCompleto = mensajeCompleto + "NF = " + imagen.alto + "\n";
+        mensajeCompleto = mensajeCompleto + "NC = " + imagen.ancho + "\n";
+        mensajeCompleto = mensajeCompleto + "NR = "+ nr +"\n";
+        mensajeCompleto = mensajeCompleto + "NP = "+ np +"\n";
+
+        
+
+        System.out.println(mensajeCompleto);
+        imagen.crearReferencias(pageSize, np, nr);
+
+
         //TODO terminar de implementar
     }
 
