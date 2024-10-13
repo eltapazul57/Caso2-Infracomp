@@ -165,19 +165,112 @@ public class Imagen {
     * y el mensaje.
     * @pos cadena contiene el mensaje escondido en la imagen
     */
-    public void recuperar(char[] cadena, int longitud ) {
-     //(imagen.ancho*3) ancho de cada fila de la matriz en bytes
-     int bytesFila=ancho*3;
-     for (int posCaracter = 0; posCaracter < longitud; posCaracter++) {
-    cadena[posCaracter]=0;
-    for (int i=0; i < 8 ; i++) {
-     // los dos primeros caracteres son la longitud. Hay que saltarlos
-     int numBytes = 16 + (posCaracter*8) + i;
-     int fila = numBytes/bytesFila;
-     int col = numBytes % (bytesFila) / 3;
-     cadena[posCaracter] =
-     (char)( cadena[posCaracter] | (imagen[fila][col][( (numBytes % bytesFila) % 3 )] & 1) << i) ;
+    public void recuperar(char[] cadena, int longitud) {
+        // (imagen.ancho*3) ancho de cada fila de la matriz en bytes
+        int bytesFila = ancho * 3;
+        for (int posCaracter = 0; posCaracter < longitud; posCaracter++) {
+            cadena[posCaracter] = 0;
+            for (int i = 0; i < 8; i++) {
+                // los dos primeros caracteres son la longitud. Hay que saltarlos
+                int numBytes = 16 + (posCaracter * 8) + i;
+                int fila = numBytes / bytesFila;
+                int col = numBytes % (bytesFila) / 3;
+                cadena[posCaracter] = (char) (cadena[posCaracter]
+                        | (imagen[fila][col][((numBytes % bytesFila) % 3)] & 1) << i);
+            }
+        }
     }
-     }
+
+    public void crearReferencias(int tamanioPaginas, int numPaginas, int numReferencias) {
+        int pagina = 0;
+        int desplazamiento = 0;
+        int referencia = 0;
+        
+        String mensaje = "";
+
+        // Referencias a la longitud del mensaje
+        for(int j=0; j < 5; j++) { 
+            for(int k=0; k < 3; k++) {
+                mensaje = mensaje + "Imagen[0]"+"["+j+"]"+auxRGB(k)+","+pagina+","+desplazamiento+",R"+"\n";
+                referencia++;
+                desplazamiento = desplazamiento + 1;
+                if (desplazamiento == tamanioPaginas) {
+                    desplazamiento = 0;
+                    pagina = pagina + 1;
+                }
+            }
+        }
+
+        int filaActual = 0;
+        int columnaActual = 5; 
+        int k = 0; // Indice de color
+        int contadorMensaje = 0;
+        int paginaMensaje = (int)Math.ceil((double)(alto * ancho * 3) / tamanioPaginas);
+        int desplazamientoMensaje = 0;
+        int contadorBits = 0;
+        int indiceMensaje = 0;
+
+        int longitud = leerLongitud();
+
+
+        // Referencias al contenido del mensaje.
+        while(contadorMensaje != longitud) {
+            
+            // Referencias de lectura
+            mensaje = mensaje + "Imagen["+filaActual +"]"+"["+columnaActual+"]"+auxRGB(k)+","+pagina+","+desplazamiento+",R"+"\n";
+            
+            desplazamiento = desplazamiento + 1;
+            if (desplazamiento == tamanioPaginas) {
+                desplazamiento = 0;
+                pagina = pagina + 1;
+            }
+
+            k++;
+            if (k == 3) {
+                k = 0;
+                columnaActual = columnaActual + 1;
+                if (columnaActual == ancho) {
+                    columnaActual = 0;
+                    filaActual = filaActual + 1;
+                }
+            }
+            
+            // Referencias de escritura. Cada 8 bits aumenta el desplazamiento.
+            mensaje = mensaje + "mensaje["+ indiceMensaje +"]"+","+paginaMensaje+","+desplazamientoMensaje+",W"+"\n"; 
+            contadorBits = contadorBits + 1;
+            if (contadorBits == 8) {
+                contadorBits = 0;
+                indiceMensaje = indiceMensaje + 1;
+                desplazamientoMensaje = desplazamientoMensaje + 1;
+                contadorMensaje = contadorMensaje + 1;
+                if (desplazamientoMensaje == tamanioPaginas) {
+                    desplazamientoMensaje = 0;
+                    paginaMensaje = paginaMensaje + 1;
+                }    
+            }
+                        
+            
+            referencia = referencia + 2;
+
+
+        }
+
+        System.out.println(mensaje);
+        System.out.println("Numero de referencias: "+referencia);
+        System.out.println("mensaje: "+contadorMensaje);
+
+
     }
+
+    private String auxRGB(int k){
+        if (k == 0) {
+            return ".R";
+        } else if (k == 1) {
+            return ".G";
+        } else {
+            return ".B";
+        }
+    }
+    
+
     }
