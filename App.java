@@ -109,7 +109,7 @@ public class App {
     }
 
     private void modificarRecentlyUsed(int[][] marcosOcupados, int indiceMarco, int tipo) {
-        if (tipo == 0 && marcosOcupados[indiceMarco][1]%10 != 0) {
+        if (tipo == 0 && (marcosOcupados[indiceMarco][1]%10 != 0 || marcosOcupados[indiceMarco][1]==0)) {
             marcosOcupados[indiceMarco][1] += 10;
         } 
         if  (tipo == 1 && marcosOcupados[indiceMarco][1]%2 != 0){
