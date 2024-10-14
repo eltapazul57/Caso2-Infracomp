@@ -99,6 +99,7 @@ public class App {
                     linea.startsWith("NP =")) {
                     String[] partes = linea.split("=");
                     if (partes.length > 1) {
+                        
                         String clave = partes[0].trim();
                         int valor = Integer.parseInt(partes[1].trim());
                         cabeceras.put(clave, valor); 
@@ -120,9 +121,13 @@ public class App {
         }
         // fin carga datos
         
-        int numMarcos = 4; // esto debe cambiar por parametro
-        int numReferencias = 0;
-        int numPaginas = 0;
+        int numMarcos = 8; // esto debe cambiar por parametro
+        int numReferencias = referencias.size();
+        int numPaginas = cabeceras.get("NP");
+        int numFilas = cabeceras.get("NF");
+        int numColumnas = cabeceras.get("NC");
+        int tamanioPaginas = cabeceras.get("P");
+        int numeroPaginas = cabeceras.get("NP");
 
         this.hits = 0;
         this.miss = 0;
@@ -134,17 +139,30 @@ public class App {
         }
 
         int indicePagina;
+        int tipo = 0;
+        int paginaEscritura = numFilas*numColumnas*3/tamanioPaginas;
+
+        System.out.println("Pagina escritura: " + paginaEscritura);
 
         
-        for (int i = 0; i < numMarcos; i++) {
-            System.out.println("Marco " + i + ": Página " + marcosOcupados[i][0] + ", RecentlyUsed " + marcosOcupados[i][1]);
-        }
-        System.out.println("xdxdxd");
+        for(int paginaActual : referencias){
 
+            if(paginaActual > paginaEscritura){
+                tipo = 0; // lectura
+            } else {
+                tipo = 1; // escritura
+            }
+
+            indicePagina = buscarIndicePagina(marcosOcupados, paginaActual);
+            modificarRecentlyUsed(marcosOcupados, indicePagina, tipo);
+        }
         
         // miss y hits
         System.out.println("Miss: " + this.miss);
         System.out.println("Hits: " + this.hits);
+        System.out.println("Porcentaje de hits: " + ((double)this.hits/(double)(numReferencias))*100 + "%");
+        System.out.println("Tiempo lectura RAM: " + (this.hits*25)+" ns");
+        System.out.println("Tiempo lectura SWAP: " + (this.miss*10)+" ms");
     }
 
     private void modificarRecentlyUsed(int[][] marcosOcupados, int indiceMarco, int tipo) {
