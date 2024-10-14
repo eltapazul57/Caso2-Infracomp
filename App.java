@@ -62,8 +62,9 @@ public class App {
 
         
 
+        mensajeCompleto = mensajeCompleto + imagen.crearReferencias(pageSize, np, nr);
         System.out.println(mensajeCompleto);
-        imagen.crearReferencias(pageSize, np, nr);
+
 
 
         //TODO terminar de implementar
@@ -71,6 +72,40 @@ public class App {
 
     public void opcionCalcularFallas(Scanner scanner) {
         //TODO
+
+        int numMarcos = 4; // esto debe cambiar por parametro
+        int numReferencias = 0;
+        int numPaginas = 0;
+
+        int hits = 0;
+        int miss = 0;
+
+        int[][] marcosOcupados = new int[numMarcos][2];
+        for (int i = 0; i < numMarcos; i++) {
+            marcosOcupados[i][0] = -1; // número de página 
+            marcosOcupados[i][1] = -1; // RecentlyUsed -> suma 10 si lee, suma 1 si escribe. 
+        }
+
+        for (int i = 0; i < numMarcos; i++) {
+            System.out.println("Marco " + i + ": Página " + marcosOcupados[i][0] + ", RecentlyUsed " + marcosOcupados[i][1]);
+        }
+        System.out.println("xdxdxd");
+
+
+        int[] referencias = new int[numReferencias];
+
+    }
+
+    private void modificarRecentlyUsed(int[][] marcosOcupados, int numMarcos, int pagina, int tipo) {
+        for (int i = 0; i < numMarcos; i++) {
+            if (marcosOcupados[i][0] == pagina) {
+                if (tipo == 0) {
+                    marcosOcupados[i][1] += 10;
+                } else {
+                    marcosOcupados[i][1] += 1;
+                }
+            }
+        }
     }
 
 
