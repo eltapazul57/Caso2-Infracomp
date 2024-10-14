@@ -8,6 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths; 
 
 public class App {    
+
+    int miss = 0;
+    int hits = 0;
     public static void main(String[] args) {
         App app = new App();
         app.mostrarMenu();
@@ -83,8 +86,8 @@ public class App {
         int numReferencias = 0;
         int numPaginas = 0;
 
-        int hits = 0;
-        int miss = 0;
+        this.hits = 0;
+        this.miss = 0;
 
         int[][] marcosOcupados = new int[numMarcos][2];
         for (int i = 0; i < numMarcos; i++) {
@@ -98,6 +101,14 @@ public class App {
         indice = buscarIndicePagina(marcosOcupados, 10);
         modificarRecentlyUsed(marcosOcupados, indice, 0);
 
+        indice = buscarIndicePagina(marcosOcupados, 11);
+        modificarRecentlyUsed(marcosOcupados, indice, 1);
+
+        indice = buscarIndicePagina(marcosOcupados, 11);
+        modificarRecentlyUsed(marcosOcupados, indice, 2);
+
+        
+
         for (int i = 0; i < numMarcos; i++) {
             System.out.println("Marco " + i + ": Página " + marcosOcupados[i][0] + ", RecentlyUsed " + marcosOcupados[i][1]);
         }
@@ -105,7 +116,10 @@ public class App {
 
 
         int[] referencias = new int[numReferencias];
-
+        
+        // miss y hits
+        System.out.println("Miss: " + this.miss);
+        System.out.println("Hits: " + this.hits);
     }
 
     private void modificarRecentlyUsed(int[][] marcosOcupados, int indiceMarco, int tipo) {
@@ -120,9 +134,11 @@ public class App {
     private int buscarIndicePagina(int[][] marcosOcupados,int pagina){
         for (int i = 0; i < marcosOcupados.length; i++) {
             if (marcosOcupados[i][0] == pagina) {
+                this.hits++;
                 return i;
             }
         }
+        this.miss++;
         int indice = buscarIndiceMenorRecentlyUsed(marcosOcupados);
         marcosOcupados[indice][0] = pagina;
         marcosOcupados[indice][1] = 0;
