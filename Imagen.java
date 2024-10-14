@@ -247,7 +247,7 @@ public class Imagen {
 
         // Referencias al contenido del mensaje.
         while (contadorMensaje != longitud) {
-
+            
             // Referencias de lectura
             if (contadorBits != -1) {
                 mensaje = mensaje + "Imagen[" + filaActual + "]" + "[" + columnaActual + "]" + auxRGB(k) + "," + pagina

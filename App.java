@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Scanner;
 import java.nio.file.Files;
@@ -45,29 +46,34 @@ public class App {
 
     public void opcionGenerarReferencias(Scanner scanner) {
         System.out.print("Ingrese el tamaño de página: ");
-        int pageSize= scanner.nextInt();
+        int pageSize = scanner.nextInt();
         System.out.print("Ingrese el nombre del archivo que guarda la imagen: ");
         String fileName = scanner.next();
         Imagen imagen = new Imagen(fileName);
 
-        int np = (imagen.alto * imagen.ancho * 3) / pageSize + (imagen.leerLongitud()/pageSize);
-        int nr = (imagen.leerLongitud()*17 + 16);
+        int np = (imagen.alto * imagen.ancho * 3) / pageSize + (imagen.leerLongitud() / pageSize);
+        int nr = (imagen.leerLongitud() * 17 + 16);
 
         String mensajeCompleto = "";
         mensajeCompleto = mensajeCompleto + "P = " + pageSize + "\n";
         mensajeCompleto = mensajeCompleto + "NF = " + imagen.alto + "\n";
         mensajeCompleto = mensajeCompleto + "NC = " + imagen.ancho + "\n";
-        mensajeCompleto = mensajeCompleto + "NR = "+ nr +"\n";
-        mensajeCompleto = mensajeCompleto + "NP = "+ np +"\n";
-
-        
+        mensajeCompleto = mensajeCompleto + "NR = " + nr + "\n";
+        mensajeCompleto = mensajeCompleto + "NP = " + np + "\n";
 
         mensajeCompleto = mensajeCompleto + imagen.crearReferencias(pageSize, np, nr);
         System.out.println(mensajeCompleto);
 
+        
+        System.out.print("Ingrese el nombre del archivo (ingrese .txt al final) para guardar las referencias: ");
+        String outputFileName = scanner.next();
 
-
-        //TODO terminar de implementar
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(outputFileName))) {
+            writer.write(mensajeCompleto);
+            System.out.println("Referencias guardadas en el archivo " + outputFileName);
+        } catch (IOException e) {
+            System.err.println("Error al escribir en el archivo: " + e.getMessage());
+        }
     }
 
     public void opcionCalcularFallas(Scanner scanner) {
@@ -86,6 +92,12 @@ public class App {
             marcosOcupados[i][1] = -1; // RecentlyUsed -> suma 10 si lee, suma 1 si escribe. 
         }
 
+        int indice = buscarIndicePagina(marcosOcupados, 13);
+        modificarRecentlyUsed(marcosOcupados, indice, 0);
+
+        indice = buscarIndicePagina(marcosOcupados, 10);
+        modificarRecentlyUsed(marcosOcupados, indice, 0);
+
         for (int i = 0; i < numMarcos; i++) {
             System.out.println("Marco " + i + ": Página " + marcosOcupados[i][0] + ", RecentlyUsed " + marcosOcupados[i][1]);
         }
@@ -96,17 +108,40 @@ public class App {
 
     }
 
-    private void modificarRecentlyUsed(int[][] marcosOcupados, int numMarcos, int pagina, int tipo) {
-        for (int i = 0; i < numMarcos; i++) {
-            if (marcosOcupados[i][0] == pagina) {
-                if (tipo == 0) {
-                    marcosOcupados[i][1] += 10;
-                } else {
-                    marcosOcupados[i][1] += 1;
-                }
-            }
+    private void modificarRecentlyUsed(int[][] marcosOcupados, int indiceMarco, int tipo) {
+        if (tipo == 0 && marcosOcupados[indiceMarco][1]%10 != 0) {
+            marcosOcupados[indiceMarco][1] += 10;
+        } 
+        if  (tipo == 1 && marcosOcupados[indiceMarco][1]%2 != 0){
+            marcosOcupados[indiceMarco][1] += 1;
         }
     }
+
+    private int buscarIndicePagina(int[][] marcosOcupados,int pagina){
+        for (int i = 0; i < marcosOcupados.length; i++) {
+            if (marcosOcupados[i][0] == pagina) {
+                return i;
+            }
+        }
+        int indice = buscarIndiceMenorRecentlyUsed(marcosOcupados);
+        marcosOcupados[indice][0] = pagina;
+        marcosOcupados[indice][1] = 0;
+        return indice;
+    }
+
+    private int buscarIndiceMenorRecentlyUsed(int[][] marcosOcupados){
+        int min = marcosOcupados[0][1];
+        int indice = 0;
+        for (int i = 1; i < marcosOcupados.length; i++) {
+            if (marcosOcupados[i][1] < min) {
+                min = marcosOcupados[i][1];
+                indice = i;
+            }
+        }
+        return indice;
+    }
+
+
 
 
     public void opcionEsconderMensaje(Scanner scanner) {
