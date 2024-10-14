@@ -1,8 +1,13 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.nio.file.Files;
 import java.nio.file.Paths; 
@@ -80,8 +85,41 @@ public class App {
     }
 
     public void opcionCalcularFallas(Scanner scanner) {
-        //TODO
+        // carga datos
 
+        System.out.print("Ingrese el nombre del archivo con las referencias: ");
+        String outputFileName = scanner.next();
+        Map<String, Integer> cabeceras = new HashMap<>();
+        List<Integer> referencias = new ArrayList<>(); 
+        try (BufferedReader br = new BufferedReader(new FileReader(outputFileName))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                if (linea.startsWith("P =") || linea.startsWith("NF =") || 
+                    linea.startsWith("NC =") || linea.startsWith("NR =") || 
+                    linea.startsWith("NP =")) {
+                    String[] partes = linea.split("=");
+                    if (partes.length > 1) {
+                        String clave = partes[0].trim();
+                        int valor = Integer.parseInt(partes[1].trim());
+                        cabeceras.put(clave, valor); 
+                    }
+                } else {
+                    String[] partes = linea.split(",");
+                    if (partes.length > 1) {
+                        int referencia = Integer.parseInt(partes[1].trim());
+                        referencias.add(referencia);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            System.err.println("Error al leer el archivo: " + e.getMessage());
+        }
+        System.out.println("Referencias leídas: " + referencias.size());
+        for (Map.Entry<String, Integer> entry : cabeceras.entrySet()) {
+            System.out.println(entry.getKey() + ": " + entry.getValue());
+        }
+        // fin carga datos
+        
         int numMarcos = 4; // esto debe cambiar por parametro
         int numReferencias = 0;
         int numPaginas = 0;
@@ -95,27 +133,14 @@ public class App {
             marcosOcupados[i][1] = -1; // RecentlyUsed -> suma 10 si lee, suma 1 si escribe. 
         }
 
-        int indice = buscarIndicePagina(marcosOcupados, 13);
-        modificarRecentlyUsed(marcosOcupados, indice, 0);
-
-        indice = buscarIndicePagina(marcosOcupados, 10);
-        modificarRecentlyUsed(marcosOcupados, indice, 0);
-
-        indice = buscarIndicePagina(marcosOcupados, 11);
-        modificarRecentlyUsed(marcosOcupados, indice, 1);
-
-        indice = buscarIndicePagina(marcosOcupados, 11);
-        modificarRecentlyUsed(marcosOcupados, indice, 2);
+        int indicePagina;
 
         
-
         for (int i = 0; i < numMarcos; i++) {
             System.out.println("Marco " + i + ": Página " + marcosOcupados[i][0] + ", RecentlyUsed " + marcosOcupados[i][1]);
         }
         System.out.println("xdxdxd");
 
-
-        int[] referencias = new int[numReferencias];
         
         // miss y hits
         System.out.println("Miss: " + this.miss);
