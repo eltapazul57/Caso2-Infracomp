@@ -121,7 +121,7 @@ public class App {
         }
         // fin carga datos
         
-        int numMarcos = 8; // esto debe cambiar por parametro
+        int numMarcos = 4; // esto debe cambiar por parametro
         int numReferencias = referencias.size();
         int numPaginas = cabeceras.get("NP");
         int numFilas = cabeceras.get("NF");
@@ -190,8 +190,16 @@ public class App {
 
     private int buscarIndiceMenorRecentlyUsed(int[][] marcosOcupados){
         int min = marcosOcupados[0][1];
+        int pagina = Integer.MAX_VALUE;
         int indice = 0;
         for (int i = 1; i < marcosOcupados.length; i++) {
+
+            if (marcosOcupados[i][1] == min && marcosOcupados[i][0] < pagina) {
+                min = marcosOcupados[i][1];
+                indice = i;
+                pagina = marcosOcupados[i][0];
+            }
+
             if (marcosOcupados[i][1] < min) {
                 min = marcosOcupados[i][1];
                 indice = i;
