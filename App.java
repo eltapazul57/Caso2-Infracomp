@@ -16,6 +16,9 @@ public class App {
 
     int miss = 0;
     int hits = 0;
+    static int indice = 0;
+    static int continuar = 0;
+    
     public static void main(String[] args) {
         App app = new App();
         app.mostrarMenu();
@@ -121,13 +124,14 @@ public class App {
         }
         // fin carga datos
         
-        int numMarcos = 4; // esto debe cambiar por parametro
+        int numMarcos = 8; // esto debe cambiar por parametro
         int numReferencias = referencias.size();
         int numPaginas = cabeceras.get("NP");
         int numFilas = cabeceras.get("NF");
         int numColumnas = cabeceras.get("NC");
         int tamanioPaginas = cabeceras.get("P");
         int numeroPaginas = cabeceras.get("NP");
+        App.continuar = 0;
 
         this.hits = 0;
         this.miss = 0;
@@ -144,7 +148,9 @@ public class App {
 
         System.out.println("Pagina escritura: " + paginaEscritura);
 
-        
+        App app = new App();
+        app.buscarIndiceMenorRecentlyUsed(marcosOcupados);
+
         for(int paginaActual : referencias){
 
             if(paginaActual > paginaEscritura){
@@ -152,10 +158,16 @@ public class App {
             } else {
                 tipo = 1; // escritura
             }
-
             indicePagina = buscarIndicePagina(marcosOcupados, paginaActual);
             modificarRecentlyUsed(marcosOcupados, indicePagina, tipo);
+            try {
+                Thread.sleep(2);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
         }
+
+        App.continuar = 1;
         
         // miss y hits
         System.out.println("Miss: " + this.miss);
@@ -174,7 +186,7 @@ public class App {
         }
     }
 
-    private int buscarIndicePagina(int[][] marcosOcupados,int pagina){
+    private synchronized int buscarIndicePagina(int[][] marcosOcupados,int pagina){
         for (int i = 0; i < marcosOcupados.length; i++) {
             if (marcosOcupados[i][0] == pagina) {
                 this.hits++;
@@ -182,36 +194,43 @@ public class App {
             }
         }
         this.miss++;
-        int indice = buscarIndiceMenorRecentlyUsed(marcosOcupados);
-        marcosOcupados[indice][0] = pagina;
-        marcosOcupados[indice][1] = 0;
+        
+        marcosOcupados[this.indice][0] = pagina;
+        marcosOcupados[this.indice][1] = 0;
         return indice;
-    }
+        }
 
-    private int buscarIndiceMenorRecentlyUsed(int[][] marcosOcupados){
-        int min = marcosOcupados[0][1];
-        int pagina = Integer.MAX_VALUE;
-        int indice = 0;
-        for (int i = 1; i < marcosOcupados.length; i++) {
-
-            if (marcosOcupados[i][1] == min && marcosOcupados[i][0] < pagina) {
+        private synchronized void buscarIndiceMenorRecentlyUsed(int[][] marcosOcupados){
+        Thread thread = new Thread(() -> {
+            while (this.continuar == 0) {
+            int min = marcosOcupados[0][1];
+            int pagina = Integer.MAX_VALUE;
+            int indice = 0;
+            for (int i = 1; i < marcosOcupados.length; i++) {
+                if (marcosOcupados[i][1] == min && marcosOcupados[i][0] < pagina) {
                 min = marcosOcupados[i][1];
                 indice = i;
                 pagina = marcosOcupados[i][0];
-            }
-
-            if (marcosOcupados[i][1] < min) {
+                }
+                if (marcosOcupados[i][1] < min) {
                 min = marcosOcupados[i][1];
                 indice = i;
+                }
             }
+            App.indice = indice;
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            
+
+            }
+        });
+        thread.start();
         }
-        return indice;
-    }
 
-
-
-
-    public void opcionEsconderMensaje(Scanner scanner) {
+        public void opcionEsconderMensaje(Scanner scanner) {
         //TODO PROBAR CON MÁS CASOS
         InputStreamReader isr = new InputStreamReader(System.in);
         BufferedReader br = new BufferedReader(isr);
