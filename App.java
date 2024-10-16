@@ -121,7 +121,7 @@ public class App {
         }
         // fin carga datos
         
-        int numMarcos = 4; // esto debe cambiar por parametro
+        int numMarcos = 8; // esto debe cambiar por parametro
         int numReferencias = referencias.size();
         int numPaginas = cabeceras.get("NP");
         int numFilas = cabeceras.get("NF");
@@ -140,7 +140,7 @@ public class App {
 
         int indicePagina;
         int tipo = 0;
-        int paginaEscritura = numFilas*numColumnas*3/tamanioPaginas;
+        int paginaEscritura = (int) Math.ceil((double) numFilas*numColumnas*3/tamanioPaginas);
 
         System.out.println("Pagina escritura: " + paginaEscritura);
 
