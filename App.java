@@ -89,7 +89,8 @@ public class App {
 
     public void opcionCalcularFallas(Scanner scanner) {
         // carga datos
-
+        System.out.print("Ingrese el tamaño de los marcos de página: ");
+        int numMarcos = scanner.nextInt();
         System.out.print("Ingrese el nombre del archivo con las referencias: ");
         String outputFileName = scanner.next();
         Map<String, Integer> cabeceras = new HashMap<>();
@@ -124,7 +125,6 @@ public class App {
         }
         // fin carga datos
         
-        int numMarcos = 8; // esto debe cambiar por parametro
         int numReferencias = referencias.size();
         int numPaginas = cabeceras.get("NP");
         int numFilas = cabeceras.get("NF");
