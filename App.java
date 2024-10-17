@@ -73,7 +73,6 @@ public class App {
         mensajeCompleto = mensajeCompleto + "NP = " + np + "\n";
 
         mensajeCompleto = mensajeCompleto + imagen.crearReferencias(pageSize, np, nr);
-        System.out.println(mensajeCompleto);
 
         
         System.out.print("Ingrese el nombre del archivo (ingrese .txt al final) para guardar las referencias: ");
@@ -124,13 +123,12 @@ public class App {
             System.out.println(entry.getKey() + ": " + entry.getValue());
         }
         // fin carga datos
-        
         int numReferencias = referencias.size();
-        int numPaginas = cabeceras.get("NP");
+        //int numPaginas = cabeceras.get("NP"); //BORRAR (?)
         int numFilas = cabeceras.get("NF");
         int numColumnas = cabeceras.get("NC");
         int tamanioPaginas = cabeceras.get("P");
-        int numeroPaginas = cabeceras.get("NP");
+        //int numeroPaginas = cabeceras.get("NP"); //BORRAR (?)
         App.continuar = 0;
 
         this.hits = 0;
@@ -168,13 +166,14 @@ public class App {
         }
 
         App.continuar = 1;
-        
         // miss y hits
         System.out.println("Miss: " + this.miss);
         System.out.println("Hits: " + this.hits);
         System.out.println("Porcentaje de hits: " + ((double)this.hits/(double)(numReferencias))*100 + "%");
+        System.out.println("Porcentaje de miss: " + ((double)this.miss/(double)(numReferencias))*100 + "%");
         System.out.println("Tiempo lectura RAM: " + (this.hits*25)+" ns");
         System.out.println("Tiempo lectura SWAP: " + (this.miss*10)+" ms");
+        System.out.println("Tiempo total (RAM + SWAP): " + (this.hits*25)/1000000+ (this.miss*10) + " ms");
     }
 
     private void modificarRecentlyUsed(int[][] marcosOcupados, int indiceMarco, int tipo) {
@@ -255,10 +254,7 @@ public class App {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
 
-        
-        
     }
     
     public void opcionRecuperarMensaje(Scanner scanner) {
