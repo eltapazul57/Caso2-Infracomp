@@ -85,7 +85,7 @@ public class App {
             System.err.println("Error al escribir en el archivo: " + e.getMessage());
         }
     }
-
+    
     public void opcionCalcularFallas(Scanner scanner) {
         // carga datos
         System.out.print("Ingrese el tamaño de los marcos de página: ");
