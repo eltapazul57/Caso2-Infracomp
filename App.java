@@ -10,15 +10,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.nio.file.Files;
-import java.nio.file.Paths; 
+import java.nio.file.Paths;
+import java.awt.Toolkit;
 
-public class App {    
+public class App {
 
     int miss = 0;
     int hits = 0;
     static int indice = 0;
     static int continuar = 0;
-    
+
     public static void main(String[] args) {
         App app = new App();
         app.mostrarMenu();
@@ -74,7 +75,6 @@ public class App {
 
         mensajeCompleto = mensajeCompleto + imagen.crearReferencias(pageSize, np, nr);
 
-        
         System.out.print("Ingrese el nombre del archivo (ingrese .txt al final) para guardar las referencias: ");
         String outputFileName = scanner.next();
 
@@ -85,7 +85,7 @@ public class App {
             System.err.println("Error al escribir en el archivo: " + e.getMessage());
         }
     }
-    
+
     public void opcionCalcularFallas(Scanner scanner) {
         // carga datos
         System.out.print("Ingrese el tamaño de los marcos de página: ");
@@ -93,19 +93,18 @@ public class App {
         System.out.print("Ingrese el nombre del archivo con las referencias: ");
         String outputFileName = scanner.next();
         Map<String, Integer> cabeceras = new HashMap<>();
-        List<Integer> referencias = new ArrayList<>(); 
+        List<Integer> referencias = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(outputFileName))) {
             String linea;
             while ((linea = br.readLine()) != null) {
-                if (linea.startsWith("P =") || linea.startsWith("NF =") || 
-                    linea.startsWith("NC =") || linea.startsWith("NR =") || 
+                if (linea.startsWith("P =") || linea.startsWith("NF =") ||
+                    linea.startsWith("NC =") || linea.startsWith("NR =") ||
                     linea.startsWith("NP =")) {
                     String[] partes = linea.split("=");
                     if (partes.length > 1) {
-                        
                         String clave = partes[0].trim();
                         int valor = Integer.parseInt(partes[1].trim());
-                        cabeceras.put(clave, valor); 
+                        cabeceras.put(clave, valor);
                     }
                 } else {
                     String[] partes = linea.split(",");
@@ -124,11 +123,9 @@ public class App {
         }
         // fin carga datos
         int numReferencias = referencias.size();
-        //int numPaginas = cabeceras.get("NP"); //BORRAR (?)
         int numFilas = cabeceras.get("NF");
         int numColumnas = cabeceras.get("NC");
         int tamanioPaginas = cabeceras.get("P");
-        //int numeroPaginas = cabeceras.get("NP"); //BORRAR (?)
         App.continuar = 0;
 
         this.hits = 0;
@@ -136,22 +133,22 @@ public class App {
 
         int[][] marcosOcupados = new int[numMarcos][2];
         for (int i = 0; i < numMarcos; i++) {
-            marcosOcupados[i][0] = -1; // número de página 
-            marcosOcupados[i][1] = -1; // RecentlyUsed -> suma 10 si lee, suma 1 si escribe. 
+            marcosOcupados[i][0] = -1; // número de página
+            marcosOcupados[i][1] = -1; // RecentlyUsed -> suma 10 si lee, suma 1 si escribe.
         }
 
         int indicePagina;
         int tipo = 0;
-        int paginaEscritura = numFilas*numColumnas*3/tamanioPaginas;
+        int paginaEscritura = numFilas * numColumnas * 3 / tamanioPaginas;
 
         System.out.println("Pagina escritura: " + paginaEscritura);
 
         App app = new App();
         app.buscarIndiceMenorRecentlyUsed(marcosOcupados);
 
-        for(int paginaActual : referencias){
+        for (int paginaActual : referencias) {
 
-            if(paginaActual > paginaEscritura){
+            if (paginaActual > paginaEscritura) {
                 tipo = 0; // lectura
             } else {
                 tipo = 1; // escritura
@@ -169,23 +166,24 @@ public class App {
         // miss y hits
         System.out.println("Miss: " + this.miss);
         System.out.println("Hits: " + this.hits);
-        System.out.println("Porcentaje de hits: " + ((double)this.hits/(double)(numReferencias))*100 + "%");
-        System.out.println("Porcentaje de miss: " + ((double)this.miss/(double)(numReferencias))*100 + "%");
-        System.out.println("Tiempo lectura RAM: " + (this.hits*25)+" ns");
-        System.out.println("Tiempo lectura SWAP: " + (this.miss*10)+" ms");
-        System.out.println("Tiempo total (RAM + SWAP): " + (this.hits*25)/1000000+ (this.miss*10) + " ms");
+        System.out.println("Porcentaje de hits: " + ((double) this.hits / (double) (numReferencias)) * 100 + "%");
+        System.out.println("Porcentaje de miss: " + ((double) this.miss / (double) (numReferencias)) * 100 + "%");
+        System.out.println("Tiempo lectura RAM: " + (this.hits * 25) + " ns");
+        System.out.println("Tiempo lectura SWAP: " + (this.miss * 10) + " ms");
+        System.out.println("Tiempo total (RAM + SWAP): " + (this.hits * 25) / 1000000 + (this.miss * 10) + " ms");
+        Toolkit.getDefaultToolkit().beep();
     }
 
     private void modificarRecentlyUsed(int[][] marcosOcupados, int indiceMarco, int tipo) {
-        if (tipo == 0 && (marcosOcupados[indiceMarco][1]%10 != 0 || marcosOcupados[indiceMarco][1]==0)) {
+        if (tipo == 0 && (marcosOcupados[indiceMarco][1] % 10 != 0 || marcosOcupados[indiceMarco][1] == 0)) {
             marcosOcupados[indiceMarco][1] += 10;
-        } 
-        if  (tipo == 1 && marcosOcupados[indiceMarco][1]%2 != 0){
+        }
+        if (tipo == 1 && marcosOcupados[indiceMarco][1] % 2 != 0) {
             marcosOcupados[indiceMarco][1] += 1;
         }
     }
 
-    private synchronized int buscarIndicePagina(int[][] marcosOcupados,int pagina){
+    private synchronized int buscarIndicePagina(int[][] marcosOcupados, int pagina) {
         for (int i = 0; i < marcosOcupados.length; i++) {
             if (marcosOcupados[i][0] == pagina) {
                 this.hits++;
@@ -193,72 +191,67 @@ public class App {
             }
         }
         this.miss++;
-        
+
         marcosOcupados[this.indice][0] = pagina;
         marcosOcupados[this.indice][1] = 0;
         return indice;
-        }
+    }
 
-        private synchronized void buscarIndiceMenorRecentlyUsed(int[][] marcosOcupados){
+    private synchronized void buscarIndiceMenorRecentlyUsed(int[][] marcosOcupados) {
         Thread thread = new Thread(() -> {
             while (this.continuar == 0) {
-            int min = marcosOcupados[0][1];
-            int pagina = Integer.MAX_VALUE;
-            int indice = 0;
-            for (int i = 1; i < marcosOcupados.length; i++) {
-                if (marcosOcupados[i][1] == min && marcosOcupados[i][0] < pagina) {
-                min = marcosOcupados[i][1];
-                indice = i;
-                pagina = marcosOcupados[i][0];
+                int min = marcosOcupados[0][1];
+                int pagina = Integer.MAX_VALUE;
+                int indice = 0;
+                for (int i = 1; i < marcosOcupados.length; i++) {
+                    if (marcosOcupados[i][1] == min && marcosOcupados[i][0] < pagina) {
+                        min = marcosOcupados[i][1];
+                        indice = i;
+                        pagina = marcosOcupados[i][0];
+                    }
+                    if (marcosOcupados[i][1] < min) {
+                        min = marcosOcupados[i][1];
+                        indice = i;
+                    }
                 }
-                if (marcosOcupados[i][1] < min) {
-                min = marcosOcupados[i][1];
-                indice = i;
+                App.indice = indice;
+                try {
+                    Thread.sleep(1);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 }
-            }
-            App.indice = indice;
-            try {
-                Thread.sleep(1);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-            
-
             }
         });
         thread.start();
-        }
+    }
 
-        public void opcionEsconderMensaje(Scanner scanner) {
-        //TODO PROBAR CON MÁS CASOS
+    public void opcionEsconderMensaje(Scanner scanner) {
         InputStreamReader isr = new InputStreamReader(System.in);
         BufferedReader br = new BufferedReader(isr);
 
         try {
-            //Lectura de IMAGEN
+            // Lectura de IMAGEN
             System.out.println("Nombre del archivo con la imagen a procesar: ");
             String ruta = br.readLine();
-            Imagen imagen = new Imagen(ruta); //generar la imagen para usarla
-            System.out.println("LONGITUD IMAGEN: "+imagen.leerLongitud());
-            //Lectura de MENSAJE
+            Imagen imagen = new Imagen(ruta); // generar la imagen para usarla
+            System.out.println("LONGITUD IMAGEN: " + imagen.leerLongitud());
+            // Lectura de MENSAJE
             System.out.println("Nombre del archivo con el mensaje a esconder: ");
             String ruta2 = br.readLine();
             String contenido = new String(Files.readAllBytes(Paths.get(ruta2)));
-            System.out.println("LONGITUD MENSAJE: "+contenido.length());
+            System.out.println("LONGITUD MENSAJE: " + contenido.length());
             char[] arregloCaracteres = contenido.toCharArray();
             System.out.println("LONGITUD ARREGLO CARACTERES: " + arregloCaracteres.length);
-            //Esconder mensaje
+            // Esconder mensaje
             imagen.esconder(arregloCaracteres, arregloCaracteres.length);
             imagen.escribirImagen(ruta);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
-
     }
-    
+
     public void opcionRecuperarMensaje(Scanner scanner) {
-        //TODO PROBAR CON MÁS CASOS
         InputStreamReader isr = new InputStreamReader(System.in);
         BufferedReader br = new BufferedReader(isr);
         try {
